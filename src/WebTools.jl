@@ -34,7 +34,7 @@ function content_type(url::AbstractString) :: Union{AbstractString, Nothing}
     m !== nothing ? m.captures[1] |> String : nothing
 end
 
-function html_tables(html::HTMLElement; selector::AbstractString="", startrow=1) ::Vector{AbstractDataFrame}
+function html_tables(html::HTMLElement; selector::AbstractString="", start_row=1) ::Vector{AbstractDataFrame}
     function fill_missing_headers(headers)
         count = 1
         for (index, value) in enumerate(headers)
@@ -50,7 +50,7 @@ function html_tables(html::HTMLElement; selector::AbstractString="", startrow=1)
     for table in tables
         table_rows = eachmatch(sel"tr", table)
         table_headers = try
-            text.(table_rows[startrow] |> children)
+            text.(table_rows[start_row] |> children)
         catch
             continue
         end
@@ -58,7 +58,7 @@ function html_tables(html::HTMLElement; selector::AbstractString="", startrow=1)
         fill_missing_headers(table_headers)
         df = DataFrame(map(th-> th => [], table_headers), makeunique=true) # create emtpy dataframe with colnames
         
-        for table_row in table_rows[startrow+1:end]
+        for table_row in table_rows[start_row+1:end]
             table_data = text.(table_row |> children)
             if length(table_data) == length(table_headers)
                 push!(df, table_data)
