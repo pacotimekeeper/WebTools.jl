@@ -2,7 +2,7 @@ module WebTools
 
 # Write your package code here.
 
-using DataFrames, DFExt
+using DataFrames
 using HTTP, Cascadia, Gumbo
 using StringEncodings
 
@@ -28,30 +28,40 @@ end
 
 function content_type(url::AbstractString) :: Union{AbstractString, Nothing}
     response = HTTP.get(url)
-    contentBody = String(response.body)
+    content_body = String(response.body)
     pattern = r"charset=(.*?)\""
-    m = match(pattern, contentBody)
+    m = match(pattern, content_body)
     m !== nothing ? m.captures[1] |> String : nothing
 end
 
 function html_tables(html::HTMLElement; selector::AbstractString="", startrow=1) ::Vector{AbstractDataFrame}
+    function fill_missing_headers(headers)
+        count = 1
+        for (index, value) in enumerate(headers)
+            if value == ""
+                headers[index] = "missing_"*string(count)
+                count += 1
+            end
+        end
+    end
+    
     tables = eachmatch(Selector("table$(selector)"), html)
     dfs = DataFrame[]
     for table in tables
-        tableRows = eachmatch(sel"tr", table)
-        tableHeader = try
-            text.(tableRows[startrow] |> children)
+        table_rows = eachmatch(sel"tr", table)
+        table_headers = try
+            text.(table_rows[startrow] |> children)
         catch
             continue
         end
         
-        fill_missing_headers(tableHeader)
-        df = DataFrame(map(th-> th => [], tableHeader), makeunique=true) # create emtpy dataframe with colnames
+        fill_missing_headers(table_headers)
+        df = DataFrame(map(th-> th => [], table_headers), makeunique=true) # create emtpy dataframe with colnames
         
-        for tableRow in tableRows[startrow+1:end]
-            tableData = text.(tableRow |> children)
-            if length(tableData) == length(tableHeader)
-                push!(df, tableData)
+        for table_row in table_rows[startrow+1:end]
+            table_data = text.(table_row |> children)
+            if length(table_data) == length(table_headers)
+                push!(df, table_data)
             end
         end
         push!(dfs, df)
