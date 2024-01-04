@@ -2,8 +2,10 @@ module WebTools
 
 # Write your package code here.
 
-using HTTP, Cascadia, Gumbo
 using DataFrames, DFExt
+using HTTP, Cascadia, Gumbo
+using StringEncodings
+
 export charset, response_content, content_type, html_tables
 
 function charset(response::HTTP.Messages.Response; default_encoding::AbstractString = "UTF-8") :: AbstractString
