@@ -6,8 +6,9 @@ using DataFrames
 using HTTP, Cascadia, Gumbo
 using StringEncodings
 
-export charset, response_content, content_type, html_tables
-export read_html
+export charset, response_content, content_type
+# html_tables
+# export read_html
 
 function charset(response::HTTP.Messages.Response; default_encoding::AbstractString = "UTF-8") :: AbstractString
     htmlstr = String(deepcopy(response.body))
