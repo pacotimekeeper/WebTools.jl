@@ -7,6 +7,7 @@ using HTTP, Cascadia, Gumbo
 using StringEncodings
 
 export charset, response_content, content_type, html_tables
+export read_html
 
 function charset(response::HTTP.Messages.Response; default_encoding::AbstractString = "UTF-8") :: AbstractString
     htmlstr = String(deepcopy(response.body))
@@ -69,6 +70,17 @@ function html_tables(html::HTMLElement; selector::AbstractString="", start_row=1
     dfs
 end
 
+
+##
+##read_html is an wrapper function for html_tables with default selector and start_row giving dataframes from the url provided
+
+##
+function read_html(url::AbstractString; selector::AbstractString="", start_row=1) ::Vector{AbstractDataFrame}
+    response = HTTP.get(url)
+    # content = response_content(response, charset(response))
+    content = response_content(response)
+    html_tables(content, selector=selector, start_row=start_row)
+end
 # greet() = print("Hello World!")
 
 end
