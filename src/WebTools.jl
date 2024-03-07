@@ -119,7 +119,7 @@ function htmlTables(html::HTMLElement; selector::AbstractString="", startRow=1):
             continue
         end
         
-        fill_missing_headers(tableHeaders)
+        fillMissingHeaders(tableHeaders)
         df = DataFrame(map(th-> th => [], tableHeaders), makeunique=true) # create emtpy dataframe with colnames
         
         for tableRow in tableRows[startRow+1:end]
@@ -134,7 +134,7 @@ function htmlTables(html::HTMLElement; selector::AbstractString="", startRow=1):
 end
 
 
-function readHTML(response::HTTP.Messages.Response, selector::AbstractString="", startRow=1)::Vector{AbstractDataFrame}
+function readHTML(response::HTTP.Messages.Response; selector::AbstractString="", startRow=1)::Vector{AbstractDataFrame}
     # content = response_content(response, charset(response))
     content = responseContent(response)
     htmlTables(content, selector=selector, startRow=startRow)
