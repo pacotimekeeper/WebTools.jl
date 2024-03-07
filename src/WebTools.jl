@@ -87,7 +87,7 @@ end
 Renaming the function into CamelCase
 
 =#
-function responseContent(response::HTTP.Messages.Response, encoding::AbstractString = "UTF-8") ::HTMLElement
+function responseContent(response::HTTP.Messages.Response, encoding::AbstractString = "UTF-8")::HTMLElement
     content = try
         parsehtml(decode(deepcopy(response.body), encoding)).root
     catch ## using UTF-8 decoding
@@ -98,7 +98,7 @@ function responseContent(response::HTTP.Messages.Response, encoding::AbstractStr
 end
 
 
-function htmlTables(html::HTMLElement; selector::AbstractString="", startRow=1) ::Vector{AbstractDataFrame}
+function htmlTables(html::HTMLElement; selector::AbstractString="", startRow=1)::Vector{AbstractDataFrame}
     function fillMissingHeaders(headers)
         count = 1
         for (index, value) in enumerate(headers)
@@ -114,7 +114,7 @@ function htmlTables(html::HTMLElement; selector::AbstractString="", startRow=1) 
     for table in tables
         tableRows = eachmatch(sel"tr", table)
         tableHeaders = try
-            text.(tableRows[start_row] |> children)
+            text.(tableRows[startRow] |> children)
         catch
             continue
         end
@@ -122,7 +122,7 @@ function htmlTables(html::HTMLElement; selector::AbstractString="", startRow=1) 
         fill_missing_headers(tableHeaders)
         df = DataFrame(map(th-> th => [], tableHeaders), makeunique=true) # create emtpy dataframe with colnames
         
-        for tableRow in tableRows[start_row+1:end]
+        for tableRow in tableRows[startRow+1:end]
             tableData = text.(tableRow |> children)
             if length(tableData) == length(tableHeaders)
                 push!(df, tableData)
@@ -134,7 +134,7 @@ function htmlTables(html::HTMLElement; selector::AbstractString="", startRow=1) 
 end
 
 
-function readHTML(response::HTTP.Messages.Response, selector::abstractstring="", startRow=1) ::vector{abstractdataframe}
+function readHTML(response::HTTP.Messages.Response, selector::AbstractString="", startRow=1)::Vector{AbstractDataFrame}
     # content = response_content(response, charset(response))
     content = responseContent(response)
     htmlTables(content, selector=selector, startRow=startRow)
