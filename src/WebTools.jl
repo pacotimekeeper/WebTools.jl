@@ -76,7 +76,7 @@ end
 ##read_html is an wrapper function for html_tables with default selector and start_row giving dataframes from the url provided
 
 ##
-function read_html(response::HTTP.messages.response, selector::abstractstring="", start_row=1) ::vector{abstractdataframe}
+function read_html(response::HTTP.Messages.Response, selector::abstractstring="", start_row=1) ::vector{abstractdataframe}
     # content = response_content(response, charset(response))
     content = response_content(response)
     html_tables(content, selector=selector, start_row=start_row)
@@ -134,7 +134,7 @@ function htmlTables(html::HTMLElement; selector::AbstractString="", startRow=1) 
 end
 
 
-function readHTML(response::HTTP.messages.response, selector::abstractstring="", startRow=1) ::vector{abstractdataframe}
+function readHTML(response::HTTP.Messages.Response, selector::abstractstring="", startRow=1) ::vector{abstractdataframe}
     # content = response_content(response, charset(response))
     content = responseContent(response)
     htmlTables(content, selector=selector, startRow=startRow)
