@@ -76,11 +76,68 @@ end
 ##read_html is an wrapper function for html_tables with default selector and start_row giving dataframes from the url provided
 
 ##
-function read_html(response::HTTP.Messages.Response, selector::AbstractString="", start_row=1) ::Vector{AbstractDataFrame}
+function read_html(response::http.messages.response, selector::abstractstring="", start_row=1) ::vector{abstractdataframe}
     # content = response_content(response, charset(response))
     content = response_content(response)
     html_tables(content, selector=selector, start_row=start_row)
 end
 # greet() = print("Hello World!")
+
+#=
+Renaming the function into CamelCase
+
+=#
+function responseContent(response::HTTP.Messages.Response, encoding::AbstractString = "UTF-8") ::HTMLElement
+    content = try
+        parsehtml(decode(deepcopy(response.body), encoding)).root
+    catch ## using UTF-8 decoding
+        println("Unable to decode with $(encoding), using UTF-8 instead")
+        parsehtml(String(deepcopy(response.body))).root
+    end
+    content
+end
+
+
+function htmlTables(html::HTMLElement; selector::AbstractString="", startRow=1) ::Vector{AbstractDataFrame}
+    function fillMissingHeaders(headers)
+        count = 1
+        for (index, value) in enumerate(headers)
+            if value == ""
+                headers[index] = "missing_"*string(count)
+                count += 1
+            end
+        end
+    end
+    
+    tables = eachmatch(Selector("table$(selector)"), html)
+    dfs = DataFrame[]
+    for table in tables
+        tableRows = eachmatch(sel"tr", table)
+        tableHeaders = try
+            text.(tableRows[start_row] |> children)
+        catch
+            continue
+        end
+        
+        fill_missing_headers(tableHeaders)
+        df = DataFrame(map(th-> th => [], tableHeaders), makeunique=true) # create emtpy dataframe with colnames
+        
+        for tableRow in tableRows[start_row+1:end]
+            tableData = text.(tableRow |> children)
+            if length(tableData) == length(tableHeaders)
+                push!(df, tableData)
+            end
+        end
+        push!(dfs, df)
+    end
+    dfs
+end
+
+
+function readHTML(response::http.messages.response, selector::abstractstring="", startRow=1) ::vector{abstractdataframe}
+    # content = response_content(response, charset(response))
+    content = responseContent(response)
+    htmlTables(content, selector=selector, startRow=startRow)
+end
 
 end
