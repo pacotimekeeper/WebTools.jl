@@ -7,6 +7,7 @@ using HTTP, Cascadia, Gumbo
 using StringEncodings
 
 export charset, response_content, content_type
+export responseContent, htmlTables, readHTML
 # html_tables
 # export read_html
 
