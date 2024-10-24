@@ -1,7 +1,7 @@
 name = "WebTools"
 uuid = "27fda2ff-bbf2-488c-ae6b-41176655c1cd"
 authors = ["Paco Ho"]
-version = "1.11.0-DEV"
+version = "0.1.0"
 
 [deps]
 Cascadia = "54eefc05-d75b-58de-a785-1a3403f0919f"
